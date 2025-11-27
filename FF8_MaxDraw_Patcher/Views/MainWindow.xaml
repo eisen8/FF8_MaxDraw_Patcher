@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="FF8_MaxDraw_Patcher.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FF8_MaxDraw_Patcher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid x:Name="RootGrid" RowDefinitions="Auto,*" RowSpacing="10">
+        <!-- Title Bar -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="#2B2B2B">
+            <!-- Draggable area: entire column but not TitleBar buttons -->
+            <Grid x:Name="TitleBarDraggableArea" Grid.Column="0" ColumnDefinitions="Auto,*">
+                <Border Width="90" Grid.Column="0"/>
+                <TextBlock Grid.Column="1" 
+                   Text="FF8 Max Draw Patcher"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- TitleBar buttons -->
+            <StackPanel HorizontalAlignment="Right" Grid.Column="1" Orientation="Horizontal">
+                <Button Content="?" Width="30" Height="30" Click="AboutBtn_Click" Background="Transparent" BorderBrush="Transparent" CornerRadius="0"/>
+                <Button Content="-" Width="30" Height="30" Click="MinimizeBtn_Click" Background="Transparent" BorderBrush="Transparent" CornerRadius="0"/>
+                <Button Content="x" Width="30" Height="30" Click="CloseBtn_Click" Background="Transparent" BorderBrush="Transparent" CornerRadius="0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Patcher -->
+        <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto" Padding="15" RowSpacing="20">
+
+            <!-- File Path Select -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                <TextBox Grid.Column="0" x:Name="PathBox"
+                 MinWidth="150"
+                                          HorizontalAlignment="Stretch"
+                 IsReadOnly="True"
+                 Text="{Binding FilePath, Mode=OneWay}"/>
+                <Border Grid.Column="1" Width="20"/>
+                <Button Grid.Column="2" x:Name="BrowseBtn"
+                Content="Browse"
+                    Width="80"
+                BorderBrush="White"
+                BorderThickness="1"
+                Command="{Binding BrowseFileCommand}"/>
+            </Grid>
+
+            <!-- Logger Box -->
+            <RichEditBox Grid.Row="1"
+             x:Name="LogBox"
+             MinHeight="150"
+             IsReadOnly="True"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch"
+             TextWrapping="Wrap"
+             ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+
+            <!-- Patch/Unpatch Button -->
+            <Button Grid.Row="2"
+            x:Name="PatchBtn"
+            Content="Patch"
+            Width="120"
+            Height="40"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+                    BorderBrush="White"
+BorderThickness="1"
+            Command="{Binding PatchCommand}"
+            IsEnabled="{Binding CanPatch}"/>
+        </Grid>
+    </Grid>
+</Window>

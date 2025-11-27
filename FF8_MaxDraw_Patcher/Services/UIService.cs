@@ -1,0 +1,50 @@
+﻿using FF8_MaxDraw_Patcher.Utils;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using System;
+using System.Threading.Tasks;
+using Windows.Storage;
+using Windows.Storage.Pickers;
+
+namespace FF8_MaxDraw_Patcher.Services
+{
+    public class UIService
+    {
+        private readonly Logger _l;
+
+        public UIService(Logger logger)
+        {
+            _l = logger;
+        }   
+
+        public async Task<StorageFile> FilePicker()
+        {
+            var picker = new FileOpenPicker();
+
+            // Required in WinUI 3 Desktop apps to initialize with window handle
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(MainWindow.Instance);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            // Filter for FF8 executable
+            picker.SuggestedStartLocation = PickerLocationId.Desktop;
+            picker.FileTypeFilter.Add(".exe");
+
+            StorageFile file = await picker.PickSingleFileAsync();
+
+            return file;
+        }
+
+        public void RequestPathBoxFocus()
+        {
+            TextBox? pathBox = MainWindow.Instance?.FilePathBox;
+
+            // Sets the focus of the PathBox to the end of the filename rather than the start.
+            if (pathBox != null)
+            {
+                pathBox.SelectionStart = pathBox.Text.Length;
+                pathBox.SelectionLength = 0;
+                pathBox.Focus(FocusState.Programmatic);
+            }
+        }
+    }
+}

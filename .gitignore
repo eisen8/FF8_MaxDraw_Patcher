@@ -1,0 +1,9 @@
+[Oo]bj/
+bin/
+
+.vs/
+.git/
+*.editorconfig
+*.user
+
+*/Properties/launchSettings.json

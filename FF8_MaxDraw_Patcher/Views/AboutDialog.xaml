@@ -1,0 +1,13 @@
+<ContentDialog
+    x:Class="FF8_MaxDraw_Patcher.AboutDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="About"
+    CloseButtonText="OK">
+
+    <StackPanel>
+        <TextBlock Text="Version 0.1.0.0-Test" Margin="0,0,0,10"/>
+        <TextBlock Text="Created by Eisen"/>
+        <TextBlock Text="A Max Draw patcher for the original FF8"/>
+    </StackPanel>
+</ContentDialog>
