@@ -6,7 +6,7 @@
     CloseButtonText="OK">
 
     <StackPanel>
-        <TextBlock Text="Version 0.1.0.0-Test" Margin="0,0,0,10"/>
+        <TextBlock Text="Version 0.1.0.1-Test" Margin="0,0,0,10"/>
         <TextBlock Text="Created by Eisen"/>
         <TextBlock Text="A Max Draw patcher for the original FF8"/>
     </StackPanel>

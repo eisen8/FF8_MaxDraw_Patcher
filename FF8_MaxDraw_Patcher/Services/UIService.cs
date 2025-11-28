@@ -8,6 +8,9 @@ using Windows.Storage.Pickers;
 
 namespace FF8_MaxDraw_Patcher.Services
 {
+    /// <summary>
+    /// Provides UI services (such as creating dialogs) for the view models.
+    /// </summary>
     public class UIService
     {
         private readonly Logger _l;
@@ -17,6 +20,10 @@ namespace FF8_MaxDraw_Patcher.Services
             _l = logger;
         }   
 
+        /// <summary>
+        /// Creates the UI file picker
+        /// </summary>
+        /// <returns>The selected file</returns>
         public async Task<StorageFile> FilePicker()
         {
             var picker = new FileOpenPicker();
@@ -25,8 +32,8 @@ namespace FF8_MaxDraw_Patcher.Services
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(MainWindow.Instance);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
-            // Filter for FF8 executable
-            picker.SuggestedStartLocation = PickerLocationId.Desktop;
+            // Filter for exectable files
+            picker.SuggestedStartLocation = PickerLocationId.ComputerFolder;
             picker.FileTypeFilter.Add(".exe");
 
             StorageFile file = await picker.PickSingleFileAsync();
@@ -34,11 +41,13 @@ namespace FF8_MaxDraw_Patcher.Services
             return file;
         }
 
+        /// <summary>
+        /// Sets the focus of the PathBox to the end of the filename rather than the start so that user can see file name. 
+        /// </summary>
         public void RequestPathBoxFocus()
         {
             TextBox? pathBox = MainWindow.Instance?.FilePathBox;
 
-            // Sets the focus of the PathBox to the end of the filename rather than the start.
             if (pathBox != null)
             {
                 pathBox.SelectionStart = pathBox.Text.Length;

@@ -1,14 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FF8_MaxDraw_Patcher.Model
+﻿namespace FF8_MaxDraw_Patcher.Model
 {
+
+    /// <summary>
+    /// The result of the file validation.
+    /// </summary>
     public class FileValidationResult
     {
+        /// <summary>
+        /// Whether validation passed or not.
+        /// </summary>
         public bool Success { get; set; }
+
+        /// <summary>
+        /// A message describing the validation result.
+        /// </summary>
         public string Message { get; set; } = string.Empty;
 
     }

@@ -1,29 +1,15 @@
 using FF8_MaxDraw_Patcher.Model;
-using FF8_MaxDraw_Patcher.Services;
 using FF8_MaxDraw_Patcher.Utils;
 using FF8_MaxDraw_Patcher.ViewModels;
 using Microsoft.UI;
 using Microsoft.UI.Text;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Documents;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Shapes;
 using System;
-using System.Collections.Specialized;
-using System.IO;
-using System.Threading.Tasks;
 using Windows.Graphics;
-using Windows.Storage;
-using Windows.Storage;
-using Windows.Storage.Pickers;
 using Windows.UI;
 using AppWindow = Microsoft.UI.Windowing.AppWindow;
-using Path = System.IO.Path;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,7 +17,7 @@ using Path = System.IO.Path;
 namespace FF8_MaxDraw_Patcher
 {
     /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// The Main Window of the patcher application.
     /// </summary>
     public sealed partial class MainWindow : Window
     {
@@ -52,7 +38,7 @@ namespace FF8_MaxDraw_Patcher
             _viewModel = viewModel;
             _appWindow = this.AppWindow;
             this.RootGrid.DataContext = _viewModel;
-            _viewModel.Logs.CollectionChanged += Logs_CollectionChanged;
+            _l.MessageLogged += OnLogAdded; // subscribe to log events
 
             // Set default size and remove old title bar
             _appWindow.Resize(new SizeInt32(500, 320));
@@ -69,67 +55,106 @@ namespace FF8_MaxDraw_Patcher
             AppWindow.SetPresenter(_presenter);
 
 
-            SetTitleBar(TitleBarDraggableArea);
+            SetTitleBar(TitleBarDraggableArea); // Makes the custom Title Bar draggable.
         }
 
-
-        private void Logs_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        /// <summary>
+        /// Event when a new log is added.
+        /// </summary>
+        private void OnLogAdded(object? sender, LogEventArgs e)
         {
-            if (e.NewItems != null)
+            DispatcherQueue.TryEnqueue(() => AppendLogToRichEditBox(e.Message, e.Color));
+        }
+
+        /// <summary>
+        /// Appends logs to the log Rich Edit Box.
+        /// </summary>
+        /// <param name="e">The log details</param>
+        private void AppendLogToRichEditBox(string message, Color color)
+        {
+            try
             {
-                foreach (LogEntry entry in e.NewItems)
+                // Make sure we are on the UI thread
+                if (!DispatcherQueue.HasThreadAccess)
                 {
-                    AppendLogToRichEditBox(entry);
+                    DispatcherQueue.TryEnqueue(() => AppendLogToRichEditBox(message, color));
+                    return;
                 }
-            }
-        }
 
-        private void AppendLogToRichEditBox(LogEntry entry)
-        {
-            if (!DispatcherQueue.HasThreadAccess)
+                var doc = LogBox.Document;
+                doc.GetText(TextGetOptions.None, out string currentText);
+                int startPosition = currentText.Length;
+
+                string newLine = $"{DateTime.Now:HH:mm:ss} -  {message}\n";
+                var range = doc.GetRange(startPosition, startPosition);
+
+                LogBox.IsReadOnly = false;
+                range.SetText(TextSetOptions.None, newLine);
+
+                // Apply the color formatting
+                range.CharacterFormat.ForegroundColor = color;
+                LogBox.IsReadOnly = true;
+
+                // Auto-scroll
+                doc = LogBox.Document;
+                doc.GetText(TextGetOptions.None, out string text);
+                int endPosition = text.Length;
+                ITextRange range2 = doc.GetRange(endPosition, endPosition);
+                doc.Selection.SetRange(endPosition, endPosition);
+                doc.Selection.ScrollIntoView(PointOptions.None);
+            }
+            catch (Exception ex)
             {
-                DispatcherQueue.TryEnqueue(() => AppendLogToRichEditBox(entry));
-                return;
+                // Log the fatal to console only to avoid potential infinite loop
+                _l.LogError(ex, "Error appending log to RichEditBox.", true);
             }
-
-            var doc = LogBox.Document;
-            doc.GetText(TextGetOptions.None, out string currentText);
-            int startPosition = currentText.Length;
-
-            string newLine = $"[{DateTime.Now:HH:mm:ss}] -  {entry.Message}\n";
-            var range = doc.GetRange(startPosition, startPosition);
-
-            LogBox.IsReadOnly = false;
-            range.SetText(TextSetOptions.None, newLine);
-
-            // Apply the color formatting
-            range.CharacterFormat.ForegroundColor = entry.Color;
-            LogBox.IsReadOnly = true;
-
-            // Auto-scroll
-            doc = LogBox.Document;
-            doc.GetText(TextGetOptions.None, out string text);
-            int endPosition = text.Length;
-            ITextRange range2 = doc.GetRange(endPosition, endPosition);
-            doc.Selection.SetRange(endPosition, endPosition);
-            doc.Selection.ScrollIntoView(PointOptions.None);
         }
 
+        /// <summary>
+        /// When the About button on the titlebar is clicked.
+        /// </summary>
         private async void AboutBtn_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new AboutDialog();
-            dialog.XamlRoot = this.Content.XamlRoot;
-            await dialog.ShowAsync();
+            try
+            {
+                var dialog = new AboutDialog();
+                dialog.XamlRoot = this.Content.XamlRoot;
+                await dialog.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                _l.LogError(ex, "Failed to open About dialog.");
+            }
         }
 
+        /// <summary>
+        /// When the minimize button on the titlebar is clicked.
+        /// </summary>
         private async void MinimizeBtn_Click(object sender, RoutedEventArgs e)
         {
-            _presenter.Minimize();
+            try
+            {
+                _presenter.Minimize();
+            }
+            catch (Exception ex)
+            {
+                _l.LogError(ex, "Failed to minimize window.");
+            }
         }
 
+        /// <summary>
+        /// When the close button on the titlebar is clicked.
+        /// </summary>
         private async void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
-        }
+            try
+            { 
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                _l.LogError(ex, "Failed to close window.");
+            }
+}
     }
 }

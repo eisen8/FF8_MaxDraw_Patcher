@@ -33,7 +33,7 @@ namespace FF8_MaxDraw_Patcher
     public partial class App : Application
     {
         private Window? _window;
-        public static IServiceProvider Services { get; private set; }
+        private IServiceProvider? _services { get; set; }
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -41,11 +41,12 @@ namespace FF8_MaxDraw_Patcher
         /// </summary>
         public App()
         {
+            Logger l = new Logger();
+            ConfigureServices(l);
             InitializeComponent();
-            ConfigureServices();
         }
 
-        private void ConfigureServices()
+        private void ConfigureServices(Logger logger)
         {
             var services = new ServiceCollection();
 
@@ -62,13 +63,13 @@ namespace FF8_MaxDraw_Patcher
             services.AddSingleton<Patcher>();
 
             // Register Utils
-            services.AddSingleton<Logger>();
+            services.AddSingleton<Logger>(logger);
 
             // Register Patch
-            services.AddSingleton<MaxDrawPatchDetails>();
+            services.AddSingleton<IPatch>(new MaxDrawPatchDetails());
 
             // Build
-            Services = services.BuildServiceProvider();
+            _services = services.BuildServiceProvider();
         }
 
         /// <summary>
@@ -77,7 +78,7 @@ namespace FF8_MaxDraw_Patcher
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            _window = Services.GetRequiredService<MainWindow>();
+            _window = _services!.GetRequiredService<MainWindow>();
             _window.Activate();
         }
     }

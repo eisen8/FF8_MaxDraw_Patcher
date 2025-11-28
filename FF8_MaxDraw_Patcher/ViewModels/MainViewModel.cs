@@ -1,19 +1,20 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FF8_MaxDraw_Patcher.Model;
-using FF8_MaxDraw_Patcher.Patch;
 using FF8_MaxDraw_Patcher.Services;
 using FF8_MaxDraw_Patcher.Utils;
 using Microsoft.UI;
 using System;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.UI;
+using static FF8_MaxDraw_Patcher.Utils.Logger;
 
 namespace FF8_MaxDraw_Patcher.ViewModels
 {
 
+    /// <summary>
+    /// View Model for the Main View.
+    /// </summary>
     public partial class MainViewModel : ObservableObject
     {
         private readonly Logger _l;
@@ -23,12 +24,17 @@ namespace FF8_MaxDraw_Patcher.ViewModels
 
         private bool _isPatching = false;
 
+        /// <summary>
+        /// The selected file path
+        /// </summary>
         [ObservableProperty]
         public string filePath = "Select a file...";
+
+        /// <summary>
+        /// Whether we can patch the selected file or not.
+        /// </summary>
         [ObservableProperty]
         public bool canPatch = false;
-
-        public ObservableCollection<LogEntry> Logs { get; } = new();
 
         public MainViewModel(UIService uiService, Patcher patcher, FileValidator validator, Logger logger) 
         {
@@ -38,57 +44,73 @@ namespace FF8_MaxDraw_Patcher.ViewModels
             _validator = validator;
         }
 
-        public void Log(string message, Windows.UI.Color? color = null)
-        {
-            Logs.Add(new LogEntry
-            {
-                Message = message,
-                Color = color ?? Colors.White
-            });
-        }
-
+        /// <summary>
+        /// Allows the user to Browse for the file to patch.
+        /// </summary>
         [RelayCommand]
         public async Task BrowseFile()
         {
-            StorageFile file = await _uiService.FilePicker();
-            if (file != null)
+            try
             {
-                FilePath = file.Path;
-                _uiService.RequestPathBoxFocus();
-                CanPatch = await ValidateFile(FilePath);
+                StorageFile file = await _uiService.FilePicker();
+                if (file != null)
+                {
+                    FilePath = file.Path;
+                    _uiService.RequestPathBoxFocus();
+
+                    // Valiate the Selected File is a valid patchable file
+                    CanPatch = await ValidateFile(FilePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                _l.LogFatal(ex, "Browsing for File threw an exception.");
             }
         }
        
+        /// <summary>
+        /// Patches the selected file.
+        /// </summary>
+        /// <returns></returns>
         [RelayCommand]
         public async Task Patch()
         {
             CanPatch = false;
             if (_isPatching) return;
             _isPatching = true;
-
             try
             {
-                Log("Backing up file...");
+                // Validate file path is selected (should always be since UI disables button if it is not)
+                if (string.IsNullOrEmpty(FilePath))
+                {
+                    _l.Log("No file selected. Cannot patch.", LogLevel.Error);
+                    return;
+                }
+
+                // Back up the file
+                _l.Log("Backing up file...");
                 string backupPath = _patcher.BackupFile(FilePath);
                 if (string.IsNullOrEmpty(backupPath))
                 {
-                    Log("Backup failed. Aborting patch.", Colors.Red);
+                    _l.Log("Backup failed. Aborting patch.", LogLevel.Error);
                     return;
                 }
-                Log($"File backed up to {backupPath}");
-                Log("Applying patch...");
-                bool result = _patcher.Patch(FilePath);
+                _l.Log($"File backed up to {backupPath}.");
+
+                // Applt patch
+                _l.Log("Applying patch...");
+                bool result = await _patcher.Patch(FilePath);
                 if (result)
                 {
-                    Log("Patch completed successfully.", ColorHelper.FromArgb(255, 0, 204, 102));
+                    _l.Log("Patch completed successfully.", Colors.Green);
                 } else
                 {
-                    Log("Patch was not successful.", Colors.Red);
+                    _l.Log("Patch was not successful.", LogLevel.Error);
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log("Patch was not successful.", Colors.Red);
+                _l.LogFatal(ex, "Patching File threw an exception.");
             }
             finally
             {
@@ -96,19 +118,31 @@ namespace FF8_MaxDraw_Patcher.ViewModels
             }
         }
 
-
+        /// <summary>
+        /// Validates the selected file.
+        /// </summary>
+        /// <param name="filePath">The file path to validate.</param>
+        /// <returns>True if the file is patchable, false if not.</returns>
         private async Task<bool> ValidateFile(string filePath)
         {
-            Log($"Validating File: {filePath}");
-            var result = _validator.ValidateFile(filePath);
-            if (result.Success)
-            {
-                Log(result.Message, ColorHelper.FromArgb(255, 0, 204, 102));
-                return true;
+            try
+            { 
+                _l.Log($"Validating File: {filePath}");
+                FileValidationResult result = await _validator.ValidateFile(filePath);
+                if (result.Success)
+                {
+                    _l.Log(result.Message, Colors.Green);
+                    return true;
+                }
+                else
+                {
+                    _l.Log(result.Message, LogLevel.Error);
+                    return false;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Log(result.Message, Colors.Red);
+                _l.LogFatal(ex, "Validating File threw an exception.");
                 return false;
             }
         }
