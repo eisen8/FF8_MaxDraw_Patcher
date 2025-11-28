@@ -10,6 +10,7 @@
 	<WindowsPackageType>None</WindowsPackageType>
     <WinUISDKReferences>false</WinUISDKReferences>
     <Nullable>enable</Nullable>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="AboutDialog.xaml" />
@@ -44,6 +45,7 @@
     <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
     <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="C:\Users\Edwar\.nuget\packages\microsoft.windowsappsdk.foundation\1.8.251104000\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />

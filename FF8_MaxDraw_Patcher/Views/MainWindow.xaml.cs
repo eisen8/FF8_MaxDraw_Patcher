@@ -7,8 +7,10 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Runtime.InteropServices;
 using Windows.Graphics;
 using Windows.UI;
+using WinRT.Interop;
 using AppWindow = Microsoft.UI.Windowing.AppWindow;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -28,6 +30,8 @@ namespace FF8_MaxDraw_Patcher
         private readonly MainViewModel _viewModel;
         private readonly OverlappedPresenter _presenter;
         private readonly Logger _l;
+        private readonly WindowMaximizeDisabler _maximizeDisabler;
+
 
         public MainWindow(MainViewModel viewModel, Logger logger)
         {
@@ -54,8 +58,11 @@ namespace FF8_MaxDraw_Patcher
             _presenter.SetBorderAndTitleBar(hasBorder: true, hasTitleBar: false);
             AppWindow.SetPresenter(_presenter);
 
+            // Makes the custom Title Bar draggable.
+            SetTitleBar(TitleBarDraggableArea);
 
-            SetTitleBar(TitleBarDraggableArea); // Makes the custom Title Bar draggable.
+            // Disable maximize on Title Bar double-click
+            _maximizeDisabler = new WindowMaximizeDisabler(this);
         }
 
         /// <summary>
@@ -148,13 +155,13 @@ namespace FF8_MaxDraw_Patcher
         private async void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
             try
-            { 
+            {
                 this.Close();
             }
             catch (Exception ex)
             {
                 _l.LogError(ex, "Failed to close window.");
             }
-}
+        }
     }
 }

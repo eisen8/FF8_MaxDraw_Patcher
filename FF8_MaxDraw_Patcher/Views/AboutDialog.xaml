@@ -4,10 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="About"
     CloseButtonText="OK">
-
-    <StackPanel>
-        <TextBlock Text="Version 0.1.0.1-Test" Margin="0,0,0,10"/>
-        <TextBlock Text="Created by Eisen"/>
-        <TextBlock Text="A Max Draw patcher for the original FF8"/>
-    </StackPanel>
+    <Grid Margin="10">
+        <RichTextBlock x:Name="AboutRichTextBlock"
+                       IsTextSelectionEnabled="True"
+                       TextWrapping="Wrap"/>
+    </Grid>
 </ContentDialog>
