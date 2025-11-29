@@ -62,7 +62,7 @@ An application to patch the original PC version of **Final Fantasy 8** (aka FF8 
 - Surprisingly we only need to change 4 bytes of the game's code. The game calculates how many spells to draw and then caps it between 0 and 9. By changing the code, we can instead just always return 100.
 
 **8. Can I do this manually instead of using your application?**
-- Yes. You will need a program that can edit hex like ImHex or Ghidra. The code to patch starts at address 0048FDE5 in Ghidra or 0008FDE0 in ImHex. You want to change bytes 79 17 33 C0 to 33 C0 04 64.
+- Yes. You will need a program that can edit hex like ImHex or Ghidra. The code to patch starts at address 0048FDE5 in Ghidra or 0008FDE5 in ImHex. You want to change bytes 79 17 33 C0 to 33 C0 04 64.
 
 ![Unpatched Code](./Docs/Screenshots/Unpatched_Assembly.png)  
 *Unpatched Code.*
