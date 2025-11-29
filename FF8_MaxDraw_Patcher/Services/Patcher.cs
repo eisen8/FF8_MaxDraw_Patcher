@@ -47,10 +47,10 @@ namespace FF8_MaxDraw_Patcher.Services
                 string backupFile = _fs.Path.Combine(directory, $"{filename}{extension}.bak"); 
                 int counter = 2;
                 
-                // Append a number if the file already exists
+                // Append a number if the file already exists (i.e. FF8.exe.bak, FF8.exe.bak2, etc)
                 while (_fs.File.Exists(backupFile)) 
                 {
-                    backupFile = _fs.Path.Combine(directory, $"{filename}_{counter}{extension}.bak");
+                    backupFile = _fs.Path.Combine(directory, $"{filename}{extension}.bak{counter}");
                     counter++; 
                 }
 

@@ -66,10 +66,10 @@ namespace FF8_MaxDraw_Patcher_Tests
             Assert.Equal(@"C:\FF8.exe.bak", backup1);
             Assert.True(_fs.FileExists(backup1));
 
-            Assert.Equal(@"C:\FF8_2.exe.bak", backup2);
+            Assert.Equal(@"C:\FF8.exe.bak2", backup2);
             Assert.True(_fs.FileExists(backup2));
 
-            Assert.Equal(@"C:\FF8_3.exe.bak", backup3);
+            Assert.Equal(@"C:\FF8.exe.bak3", backup3);
             Assert.True(_fs.FileExists(backup3));
         }
 
