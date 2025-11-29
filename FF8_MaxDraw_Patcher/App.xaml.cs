@@ -79,6 +79,7 @@ namespace FF8_MaxDraw_Patcher
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             _window = _services!.GetRequiredService<MainWindow>();
+            _window.Title = "FF8 MaxDraw Patcher";
             _window.Activate();
         }
     }

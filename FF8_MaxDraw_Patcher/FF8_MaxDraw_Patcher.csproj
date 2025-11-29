@@ -1,56 +1,53 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <RootNamespace>FF8_MaxDraw_Patcher</RootNamespace>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>x86;x64;</Platforms>
-    <RuntimeIdentifiers>win-x86;win-x64;</RuntimeIdentifiers>
-	<WindowsPackageType>None</WindowsPackageType>
-    <WinUISDKReferences>false</WinUISDKReferences>
-    <Nullable>enable</Nullable>
-	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Remove="AboutDialog.xaml" />
-  </ItemGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<RootNamespace>FF8_MaxDraw_Patcher</RootNamespace>
+		<Platforms>x86;x64;</Platforms>
+		<RuntimeIdentifiers>win-x86;win-x64;</RuntimeIdentifiers>
+		<WindowsPackageType>None</WindowsPackageType>
+		<WinUISDKReferences>false</WinUISDKReferences>
+		<Nullable>enable</Nullable>
+		<ApplicationIcon>Assets\appicon.ico</ApplicationIcon>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
+	<!-- Assembly Info -->
+	<PropertyGroup>
+		<AssemblyTitle>FF8 MaxDraw Patcher</AssemblyTitle>
+		<Product>FF8 MaxDraw Patcher</Product>
+		<Company>Eisen</Company>
+		<FileDescription>FF8 MaxDraw Patcher</FileDescription>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.2</FileVersion>
+		<InformationalVersion>1.0.0.2</InformationalVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7175" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
-    <PackageReference Include="Serilog" Version="4.3.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="AboutDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets\" />
-    <Folder Include="Views\" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7175" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
+		<PackageReference Include="Serilog" Version="4.3.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+	</ItemGroup>
 
-  <!-- Publish Properties -->
-  <PropertyGroup>
-    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
-    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
-    <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
-    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="C:\Users\Edwar\.nuget\packages\microsoft.windowsappsdk.foundation\1.8.251104000\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="C:\Users\Edwar\.nuget\packages\microsoft.windowsappsdk.runtime\1.8.251106002\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
-  </ItemGroup>
+	<!-- Publish Properties -->
+	<PropertyGroup>
+		<PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
+		<PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+		<PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
+		<PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<ApplicationIcon>Assets\appicon.ico</ApplicationIcon>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Remove="C:\Users\Edwar\.nuget\packages\microsoft.windowsappsdk.foundation\1.8.251104000\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Remove="C:\Users\Edwar\.nuget\packages\microsoft.windowsappsdk.runtime\1.8.251106002\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
+	</ItemGroup>
 </Project>

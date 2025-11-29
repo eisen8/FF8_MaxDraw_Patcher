@@ -10,6 +10,7 @@ using System;
 using System.Runtime.InteropServices;
 using Windows.Graphics;
 using Windows.UI;
+using Windows.UI.WindowManagement;
 using WinRT.Interop;
 using AppWindow = Microsoft.UI.Windowing.AppWindow;
 
@@ -63,6 +64,9 @@ namespace FF8_MaxDraw_Patcher
 
             // Disable maximize on Title Bar double-click
             _maximizeDisabler = new WindowMaximizeDisabler(this);
+
+            // Set Icon
+            _appWindow.SetIcon(@"Assets\appicon.ico");
         }
 
         /// <summary>
