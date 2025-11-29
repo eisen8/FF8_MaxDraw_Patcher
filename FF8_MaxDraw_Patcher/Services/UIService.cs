@@ -1,4 +1,5 @@
-﻿using FF8_MaxDraw_Patcher.Utils;
+﻿using FF8_MaxDraw_Patcher.Services.Interfaces;
+using FF8_MaxDraw_Patcher.Utils;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -11,14 +12,14 @@ namespace FF8_MaxDraw_Patcher.Services
     /// <summary>
     /// Provides UI services (such as creating dialogs) for the view models.
     /// </summary>
-    public class UIService
+    public class UIService : IUIService
     {
         private readonly Logger _l;
 
         public UIService(Logger logger)
         {
             _l = logger;
-        }   
+        }
 
         /// <summary>
         /// Creates the UI file picker

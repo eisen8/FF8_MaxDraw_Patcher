@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FF8_MaxDraw_Patcher.Model;
-using FF8_MaxDraw_Patcher.Services;
+using FF8_MaxDraw_Patcher.Services.Interfaces;
 using FF8_MaxDraw_Patcher.Utils;
 using Microsoft.UI;
 using System;
@@ -18,9 +18,9 @@ namespace FF8_MaxDraw_Patcher.ViewModels
     public partial class MainViewModel : ObservableObject
     {
         private readonly Logger _l;
-        private readonly UIService _uiService;
-        private readonly Patcher _patcher;
-        private readonly FileValidator _validator;
+        private readonly IUIService _uiService;
+        private readonly IPatcher _patcher;
+        private readonly IFileValidator _validator;
 
         private bool _isPatching = false;
 
@@ -36,7 +36,7 @@ namespace FF8_MaxDraw_Patcher.ViewModels
         [ObservableProperty]
         public bool canPatch = false;
 
-        public MainViewModel(UIService uiService, Patcher patcher, FileValidator validator, Logger logger) 
+        public MainViewModel(IUIService uiService, IPatcher patcher, IFileValidator validator, Logger logger) 
         {
             _patcher = patcher;
             _l = logger;
@@ -75,8 +75,9 @@ namespace FF8_MaxDraw_Patcher.ViewModels
         [RelayCommand]
         public async Task Patch()
         {
+            if (_isPatching || !CanPatch) return;
+
             CanPatch = false;
-            if (_isPatching) return;
             _isPatching = true;
             try
             {

@@ -1,8 +1,9 @@
 ﻿using FF8_MaxDraw_Patcher.Patch;
+using FF8_MaxDraw_Patcher.Services.Interfaces;
 using FF8_MaxDraw_Patcher.Utils;
 using System;
 using System.IO;
-using System.Linq;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 
 namespace FF8_MaxDraw_Patcher.Services
@@ -10,15 +11,17 @@ namespace FF8_MaxDraw_Patcher.Services
     /// <summary>
     /// Provides patching services for applying patches to files.
     /// </summary>
-    public class Patcher
+    public class Patcher : IPatcher
     {
         private readonly IPatch _patch;
         private readonly Logger _l;
+        private readonly IFileSystem _fs;
 
-        public Patcher(IPatch patch, Logger logger)
+        public Patcher(IPatch patch, IFileSystem fileSystem, Logger logger)
         {
             _patch = patch;
             _l = logger;
+            _fs = fileSystem;
         }
 
         /// <summary>
@@ -28,7 +31,7 @@ namespace FF8_MaxDraw_Patcher.Services
         /// <returns>The full filepath to the backup file. Returns an empty string if the file cannot be backed up.</returns>
         public string BackupFile(string filePath)
         {
-            if (!File.Exists(filePath))
+            if (!_fs.File.Exists(filePath))
             {
                 _l.Log("Cannot backup file: File does not exist.");
                 return "";
@@ -36,14 +39,22 @@ namespace FF8_MaxDraw_Patcher.Services
 
             try
             {
-                string directory = Path.GetDirectoryName(filePath) ?? Directory.GetCurrentDirectory();
-                string filename = Path.GetFileNameWithoutExtension(filePath);
-                string extension = Path.GetExtension(filePath);
+                string directory = _fs.Path.GetDirectoryName(filePath) ?? _fs.Directory.GetCurrentDirectory();
+                string filename = _fs.Path.GetFileNameWithoutExtension(filePath);
+                string extension = _fs.Path.GetExtension(filePath);
 
                 // Create a backup filename with timestamp and .bak extension
-                string backupFile = Path.Combine(directory, $"{filename}_{DateTime.Now:yyyyMMdd_HHmmss}{extension}.bak");
+                string backupFile = _fs.Path.Combine(directory, $"{filename}{extension}.bak"); 
+                int counter = 2;
+                
+                // Append a number if the file already exists
+                while (_fs.File.Exists(backupFile)) 
+                {
+                    backupFile = _fs.Path.Combine(directory, $"{filename}_{counter}{extension}.bak");
+                    counter++; 
+                }
 
-                File.Copy(filePath, backupFile, overwrite: false);
+                _fs.File.Copy(filePath, backupFile, overwrite: false);
 
                 return backupFile;
             }
@@ -62,15 +73,15 @@ namespace FF8_MaxDraw_Patcher.Services
         /// <returns>True if the patch was successful or false if not.</returns>
         public async Task<bool> Patch(string filePath)
         {
-            Byte[] searchPattern = ByteUtil.ConcatArrays(_patch.PreValidationBits, _patch.Unpatch, _patch.PostValidationBits);
+            Byte[] searchPattern = ByteUtil.ConcatArrays(_patch.PreValidationBytes, _patch.OriginalBytes, _patch.PostValidationBytes);
             long offset = await SearchBytePattern(filePath, searchPattern);
 
             if (offset != -1)
             {
-                offset += _patch.PreValidationBits.Length;
-                using FileStream fs = File.Open(filePath, FileMode.Open, FileAccess.Write);
+                offset += _patch.PreValidationBytes.Length;
+                using Stream fs = _fs.File.Open(filePath, FileMode.Open, FileAccess.Write);
                 fs.Seek(offset, SeekOrigin.Begin);
-                fs.Write(_patch.Patch, 0, _patch.Patch.Length);
+                fs.Write(_patch.PatchBytes, 0, _patch.PatchBytes.Length);
                 return true;
             }
 
@@ -84,7 +95,7 @@ namespace FF8_MaxDraw_Patcher.Services
         /// <returns>True if patchable or false if not.</returns>
         public async Task<bool> IsFilePatchable(string filePath)
         {
-            Byte[] searchPattern = ByteUtil.ConcatArrays(_patch.PreValidationBits, _patch.Unpatch, _patch.PostValidationBits);
+            Byte[] searchPattern = ByteUtil.ConcatArrays(_patch.PreValidationBytes, _patch.OriginalBytes, _patch.PostValidationBytes);
             return await SearchBytePattern(filePath, searchPattern) != -1;
         }
 
@@ -95,7 +106,7 @@ namespace FF8_MaxDraw_Patcher.Services
         /// <returns>True if the file is already patched or false if not.</returns>
         public async Task<bool> IsFileAlreadyPatched(string filePath)
         {
-            Byte[] searchPattern = ByteUtil.ConcatArrays(_patch.PreValidationBits, _patch.Patch, _patch.PostValidationBits);
+            Byte[] searchPattern = ByteUtil.ConcatArrays(_patch.PreValidationBytes, _patch.PatchBytes, _patch.PostValidationBytes);
             return await SearchBytePattern(filePath, searchPattern) != -1;
         }
 
@@ -108,7 +119,7 @@ namespace FF8_MaxDraw_Patcher.Services
         /// <returns>The offset of the first occurence or -1 if not found.</returns>
         private async Task<int> SearchBytePattern(string filePath, byte[] pattern)
         {
-            if (!File.Exists(filePath))
+            if (!_fs.File.Exists(filePath))
             {
                 _l.Log("Cannot Search File: File does not exist.");
                 return -1;
@@ -116,7 +127,7 @@ namespace FF8_MaxDraw_Patcher.Services
 
             // We could read in sections and do a faster algorithm (like KMP or Boyer-Moore) but the patch file is small and is read very quickly (< 1s).
 
-            byte[] data = await File.ReadAllBytesAsync(filePath);
+            byte[] data = await _fs.File.ReadAllBytesAsync(filePath);
 
             for (int i = 0; i <= data.Length - pattern.Length; i++)
             {

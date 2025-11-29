@@ -7,21 +7,21 @@ namespace FF8_MaxDraw_Patcher.Patch
         /// <summary>
         /// Bytes to insert.
         /// </summary>
-        byte[] Patch { get; }
+        byte[] PatchBytes { get; }
 
         /// <summary>
-        /// Original bytes to replace.
+        /// Original bytes to be replaced by the PatchBytes.
         /// </summary>
-        byte[] Unpatch { get; }
+        byte[] OriginalBytes { get; }
 
         /// <summary>
         /// Validation bytes before the unpatch. Necessary if the patch bytes aren't long and unique enough.
         /// </summary>
-        byte[] PreValidationBits { get; }
+        byte[] PreValidationBytes { get; }
 
         /// <summary>
         /// Validation bytes after the unpatch.  Necessary if the patch bytes aren't long and unique enough.
         /// </summary>
-        byte[] PostValidationBits { get; }
+        byte[] PostValidationBytes { get; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FF8_MaxDraw_Patcher.Patch;
 using FF8_MaxDraw_Patcher.Services;
+using FF8_MaxDraw_Patcher.Services.Interfaces;
 using FF8_MaxDraw_Patcher.Utils;
 using FF8_MaxDraw_Patcher.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,7 @@ using Microsoft.UI.Xaml.Shapes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
@@ -53,14 +55,17 @@ namespace FF8_MaxDraw_Patcher
             // Register Views
             services.AddSingleton<MainWindow>();
             services.AddSingleton<AboutDialog>();
-            services.AddSingleton<UIService>();
+            services.AddSingleton<IUIService, UIService>();
 
             // Register ViewModels
             services.AddSingleton<MainViewModel>();
 
+            // Register FileSystem
+            services.AddSingleton<IFileSystem, FileSystem>();
+
             // Register Services
-            services.AddSingleton<FileValidator>();
-            services.AddSingleton<Patcher>();
+            services.AddSingleton<IFileValidator, FileValidator>();
+            services.AddSingleton<IPatcher, Patcher>();
 
             // Register Utils
             services.AddSingleton<Logger>(logger);

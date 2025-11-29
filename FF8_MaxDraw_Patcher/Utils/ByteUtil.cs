@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FF8_MaxDraw_Patcher.Utils
 {
@@ -15,10 +16,13 @@ namespace FF8_MaxDraw_Patcher.Utils
         /// <returns>The byte array</returns>
         public static byte[] FromHexString(string hex)
         {
+            if (hex == null)
+                throw new ArgumentNullException(nameof(hex), "Hex argument was null");
+
             string hexCleaned = string.Concat(hex.Where(c => !char.IsWhiteSpace(c))); // Remove whitespace
 
             if (hexCleaned.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) // Remove 0x prefix
-                hexCleaned = hex.Substring(2);
+                hexCleaned = hexCleaned.Substring(2);
 
             return Convert.FromHexString(hexCleaned);
         }
@@ -30,11 +34,19 @@ namespace FF8_MaxDraw_Patcher.Utils
         /// <returns>A new single array of the bytes</returns>
         public static byte[] ConcatArrays(params byte[][] arrays)
         {
+            if (arrays == null)
+                throw new ArgumentNullException(nameof(arrays), "Arrays argument was null");
+
             int totalLength = 0;
 
             // Compute total length
             foreach (var arr in arrays)
+            {
+                if (arr == null)
+                    throw new ArgumentNullException(nameof(arrays), "One of the provided arrays is null.");
+                
                 totalLength += arr.Length;
+            }
 
             byte[] result = new byte[totalLength];
 

@@ -1,8 +1,8 @@
 ﻿using FF8_MaxDraw_Patcher.Model;
-using FF8_MaxDraw_Patcher.Patch;
+using FF8_MaxDraw_Patcher.Services.Interfaces;
 using FF8_MaxDraw_Patcher.Utils;
-using System;
 using System.IO;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 
 
@@ -11,15 +11,17 @@ namespace FF8_MaxDraw_Patcher.Services
     /// <summary>
     /// A class for validating files before patching.
     /// </summary>
-    public class FileValidator
+    public class FileValidator : IFileValidator
     {
-        private readonly Patcher _patcher;
+        private readonly IPatcher _patcher;
         private readonly Logger _l;
+        private readonly IFileSystem _fs;
 
-        public FileValidator(Patcher patcher, Logger logger)
+        public FileValidator(IPatcher patcher, IFileSystem fileSystem, Logger logger)
         {
             _patcher = patcher;
             _l = logger;
+            _fs = fileSystem;
         }
 
         /// <summary>
@@ -29,20 +31,25 @@ namespace FF8_MaxDraw_Patcher.Services
         /// <returns>The validation result.</returns>
         public async Task<FileValidationResult> ValidateFile(string filePath)
         {
+            if (filePath == null || string.IsNullOrWhiteSpace(filePath))
+            {
+                return new FileValidationResult() { Success = false, Message = "No file selected." };
+            }
+
             // Validate the file exists
-            if (!File.Exists(filePath))
+            if (!_fs.File.Exists(filePath))
             {
                 return new FileValidationResult() { Success = false, Message = "Selected file does not exist." };
             }
 
             // Validate the extension is correct
-            if (!Path.GetExtension(filePath).ToLower().Equals(".exe"))
+            if (!_fs.Path.GetExtension(filePath).ToLower().Equals(".exe"))
             {
                 return new FileValidationResult() { Success = false, Message = "Selected file must be an executable (.exe)." };
             }
 
             // Validate approximate file size
-            FileInfo fi = new FileInfo(filePath);
+            IFileInfo fi = _fs.FileInfo.New(filePath);
             if (fi.Length > 40000000 || fi.Length < 10000000)
             {
                 return new FileValidationResult() { Success = false, Message = "File size is invalid for FF8.exe." };
@@ -73,11 +80,11 @@ namespace FF8_MaxDraw_Patcher.Services
         /// </summary>
         /// <param name="filePath">The file path</param>
         /// <returns>True if writeable or false if not.</returns>
-        private static bool IsFileWritable(string filePath)
+        private bool IsFileWritable(string filePath)
         {
             try
             {
-                using var stream = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite);
+                using var stream = _fs.File.Open(filePath, FileMode.Open, FileAccess.ReadWrite);
                 // If we can open it for read/write, it's writable
                 return true;
             }

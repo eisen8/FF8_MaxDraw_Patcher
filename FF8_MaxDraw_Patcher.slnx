@@ -1,6 +1,5 @@
 <Solution>
   <Configurations>
-    <Platform Name="ARM64" />
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
@@ -8,9 +7,12 @@
     <File Path=".editorconfig" />
   </Folder>
   <Project Path="FF8_MaxDraw_Patcher/FF8_MaxDraw_Patcher.csproj">
-    <Platform Solution="*|ARM64" Project="ARM64" />
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
     <Deploy />
+  </Project>
+  <Project Path="FF8_MaxDraw_Patcher_Tests/FF8_MaxDraw_Patcher_Tests.csproj" Id="42c42076-a094-474e-b44c-5f3862511095">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
   </Project>
 </Solution>
