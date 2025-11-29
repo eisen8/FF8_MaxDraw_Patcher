@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="About"
     CloseButtonText="OK">
-    <Grid Margin="10">
+    <Grid>
         <RichTextBlock x:Name="AboutRichTextBlock"
                        IsTextSelectionEnabled="True"
                        TextWrapping="Wrap"/>

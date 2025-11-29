@@ -36,41 +36,41 @@
             <!-- File Path Select -->
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
                 <TextBox Grid.Column="0" x:Name="PathBox"
-                 MinWidth="150"
-                                          HorizontalAlignment="Stretch"
-                 IsReadOnly="True"
-                 Text="{Binding FilePath, Mode=OneWay}"/>
+                     MinWidth="150"
+                     HorizontalAlignment="Stretch"
+                     IsReadOnly="True"
+                     Text="{Binding FilePath, Mode=OneWay}"/>
                 <Border Grid.Column="1" Width="20"/>
                 <Button Grid.Column="2" x:Name="BrowseBtn"
-                Content="Browse"
-                    Width="80"
-                BorderBrush="White"
-                BorderThickness="1"
-                Command="{Binding BrowseFileCommand}"/>
+                    Content="Browse"
+                        Width="80"
+                    BorderBrush="White"
+                    BorderThickness="1"
+                    Command="{Binding BrowseFileCommand}"/>
             </Grid>
 
             <!-- Logger Box -->
             <RichEditBox Grid.Row="1"
-             x:Name="LogBox"
-             MinHeight="150"
-             IsReadOnly="True"
-             HorizontalAlignment="Stretch"
-             VerticalAlignment="Stretch"
-             TextWrapping="Wrap"
-             ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                 x:Name="LogBox"
+                 MinHeight="150"
+                 IsReadOnly="True"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Stretch"
+                 TextWrapping="Wrap"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"/>
 
             <!-- Patch/Unpatch Button -->
             <Button Grid.Row="2"
-            x:Name="PatchBtn"
-            Content="Patch"
-            Width="120"
-            Height="40"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Bottom"
-                    BorderBrush="White"
-BorderThickness="1"
-            Command="{Binding PatchCommand}"
-            IsEnabled="{Binding CanPatch}"/>
+                 x:Name="PatchBtn"
+                 Content="Patch"
+                 Width="120"
+                 Height="40"
+                 HorizontalAlignment="Right"
+                 VerticalAlignment="Bottom"
+                 BorderBrush="White"
+                 BorderThickness="1"
+                 Command="{Binding PatchCommand}"
+                 IsEnabled="{Binding CanPatch}"/>
         </Grid>
     </Grid>
 </Window>
